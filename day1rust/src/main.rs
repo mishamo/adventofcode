@@ -1,6 +1,7 @@
 use std::{env, io};
 use std::fs::File;
 use std::io::BufRead;
+use std::process::exit;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -8,17 +9,20 @@ fn main() {
 
     let file = File::open(file_path).expect("Should have been able to open file");
     let lines = io::BufReader::new(file).lines();
-    let mut count: i32 = 0;
-    let mut sums: Vec<i32> = Vec::new();
+    let mut count: u32 = 0;
+    let mut sums: Vec<u32> = Vec::new();
     for line in lines {
-        if let Ok(ln) = line {
-            if ln.is_empty() {
-                sums.push(count);
-                count = 0;
-            } else {
-                let current_number: i32 = ln.parse().unwrap();
-                count += current_number;
+        match line {
+            Ok(ln) => {
+                if ln.is_empty() {
+                    sums.push(count);
+                    count = 0;
+                } else {
+                    let current_number: u32 = ln.parse().expect("Expected number");
+                    count += current_number;
+                }
             }
+            Err(_) => exit(1)
         }
     }
     sums.sort();
@@ -27,5 +31,5 @@ fn main() {
         (Some(a), Some(b), Some(c)) => a + b + c,
         _ => 0,
     };
-    println!("{}", total);
+    println!("{total}");
 }
